@@ -18,16 +18,12 @@ class BookList extends Component {
     );
   };
 
-  filterBooksByColor = bookColor => {
-    return this.state.filteredBooks.filter(book => book.color === bookColor);
-  };
-
   render() {
     const bookColor = this.props.match.params.bookColor;
     let books = this.filterBooks();
 
     if (bookColor) {
-      books = this.filterBooksByColor(bookColor);
+      books = books.filter(book => book.color === bookColor);
     }
 
     return (
