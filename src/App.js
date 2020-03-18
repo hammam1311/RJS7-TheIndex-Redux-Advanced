@@ -34,6 +34,7 @@ class App extends Component {
     try {
       const authorsReq = this.fetchAllAuthors();
       const booksReq = this.fetchAllBooks();
+
       const authors = await authorsReq;
       const books = await booksReq;
 
