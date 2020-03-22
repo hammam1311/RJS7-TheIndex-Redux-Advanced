@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+import { connect } from "react-redux"
 
 // Components
 import BookTable from "./BookTable";
@@ -10,14 +11,7 @@ const instance = axios.create({
 });
 
 class AuthorDetail extends Component {
-  state = {
-    author: null,
-    loading: true
-  };
 
-  componentDidMount() {
-    this.getAuthor();
-  }
 
   componentDidUpdate(prevProps) {
     if (prevProps.match.params.authorID !== this.props.match.params.authorID) {
@@ -25,40 +19,36 @@ class AuthorDetail extends Component {
     }
   }
 
-  getAuthor = async () => {
-    const authorID = this.props.match.params.authorID;
-    this.setState({ loading: true });
 
-    try {
-      const res = await instance.get(`/api/authors/${authorID}`);
-      const author = res.data;
-      this.setState({ author: author, loading: false });
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   render() {
-    if (this.state.loading) {
-      return <Loading />;
-    } else {
-      const author = this.state.author;
-      const authorName = `${author.first_name} ${author.last_name}`;
-      return (
-        <div className="author">
-          <div>
-            <h3>{authorName}</h3>
-            <img
-              src={author.imageUrl}
-              className="img-thumbnail img-fluid"
-              alt={authorName}
-            />
-          </div>
-          <BookTable books={author.books} />
+
+    const author = this.props.authors.find(author =>
+      author.id === +this.props.match.params.authorID);
+    const authorName = `${author.first_name} ${author.last_name}`;
+    const authorBooks = author.books.map(bookID =>
+      this.props.books.find(book => book.id === bookID))
+    return (
+      <div className="author">
+        <div>
+          <h3>{authorName}</h3>
+          <img
+            src={author.imageUrl}
+            className="img-thumbnail img-fluid"
+            alt={authorName}
+          />
         </div>
-      );
-    }
+        <BookTable books={authorBooks} />
+      </div>
+    );
+  }
+
+}
+const mapStateToProps = state => {
+  return {
+    books: state.booksState.books,
+    authors: state.authorsState.authors,
   }
 }
 
-export default AuthorDetail;
+export default connect(mapStateToProps)(AuthorDetail);
